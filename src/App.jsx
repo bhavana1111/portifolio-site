@@ -205,7 +205,7 @@ const IMPACT = [
   {
     label: "Founder",
     value: "IIM-V Incubated",
-    note: "15+ vendors onboarded globally",
+    note: "15+ vendors successfully onboarded",
   },
 ];
 
@@ -251,7 +251,7 @@ const EXPERIENCE = [
   {
     company: "TraditionOnWay",
     role: "Founder",
-    time: "2020 – 2021",
+    time: "2020 – 2022",
     tags: ["IIM-V Incubated", "Founder", "Vendor Onboarding", "Growth"],
     highlights: [
       "Founded a platform to help local vendors build a global online presence and sell products digitally (COVID period).",
@@ -279,7 +279,7 @@ const EXPERIENCE = [
   {
     company: "UTSA",
     role: "Research Assistant",
-    time: "2023 – 2024",
+    time: "2023 – 2026",
     tags: ["ICSE 2026 • NIER", "First Author", "LLM + RAG", "Android"],
     highlights: [
       "First author: ICSE 2026 (NIER) paper on LLM + RAG-based Android UI exploration/testing.",
@@ -525,6 +525,59 @@ function OtherWorkRow({ p }) {
   );
 }
 
+function FeaturedIn() {
+  return (
+    <Section
+      id="featured"
+      title="Recognition"
+      subtitle="Recognition & publications"
+    >
+      <Card className="p-6">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center">
+          {/* Publication Preview */}
+          <div className="w-full md:w-72 shrink-0 overflow-hidden rounded-xl border border-slate-200">
+            <img
+              src="/iim-feature.png"
+              alt="Featured in IIM Visakhapatnam Startup Book"
+              className="w-full object-cover"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-slate-900">
+              IIM Visakhapatnam — Women Startup Program
+            </h3>
+
+            <p className="mt-2 text-sm text-slate-600">
+              Featured as Founder of{" "}
+              <span className="font-medium">TraditionOnWay</span> in the IIM-V
+              Coffee Table Book (2020–22).
+            </p>
+
+            <p className="mt-1 text-sm font-medium text-indigo-600">Page 37</p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Badge tone="good">IIM-V Incubated</Badge>
+              <Badge tone="brand">Founder</Badge>
+              <Badge tone="warm">Publication</Badge>
+            </div>
+
+            <div className="mt-5">
+              <ButtonLink
+                href="/iim-coffee-break-book.pdf#page=37"
+                variant="primary"
+                target="_blank"
+              >
+                View Publication
+              </ButtonLink>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Section>
+  );
+}
 // ---------- App ----------
 export default function App() {
   const [q, setQ] = useState("");
@@ -631,11 +684,7 @@ export default function App() {
           <Divider />
 
           {/* experience */}
-          <Section
-            id="experience"
-            title="Experience"
-            subtitle="Short highlights first. Expand for details only if needed — less content heavy, more recruiter-friendly."
-          >
+          <Section id="experience" title="Experience">
             <div className="space-y-5">
               {EXPERIENCE.map((e) => (
                 <ExperienceRow key={`${e.company}-${e.role}`} item={e} />
@@ -698,6 +747,8 @@ export default function App() {
           </Section>
 
           <Divider />
+          <FeaturedIn />
+          <Divider />
 
           {/* contact */}
           <Section id="contact" title="Contact">
@@ -717,7 +768,7 @@ export default function App() {
 
                 {/* UPDATED: Preview opens modal */}
                 <div className="flex flex-wrap gap-2">
-                  <ButtonLink href={LINKS.email} variant="primary">
+                  <ButtonLink href={LINKS.email} variant="secondary">
                     Email
                   </ButtonLink>
                   <ButtonLink href={LINKS.linkedin} variant="secondary">
@@ -736,7 +787,6 @@ export default function App() {
               </div>
             </Card>
           </Section>
-
           <div className="pb-16" />
         </Container>
       </main>
