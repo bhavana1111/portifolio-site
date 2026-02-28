@@ -4,7 +4,7 @@ const LINKS = {
   github: "https://github.com/bhavana1111",
   linkedin: "https://www.linkedin.com/in/bhavanakondeti/",
   email: "mailto:bhavanakondeti2000@email.com",
-  resume: "/Bhavana_Kondeti_Resume.pdf",
+  resume: "/Bhavana_K_Resume.pdf",
 };
 
 // ---------- UI primitives ----------
@@ -50,7 +50,14 @@ function Card({ children, className = "" }) {
   );
 }
 
-function ButtonLink({ href, children, variant = "primary" }) {
+function ButtonLink({
+  href,
+  children,
+  variant = "primary",
+  target,
+  rel,
+  download,
+}) {
   const base =
     "inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2";
   const styles =
@@ -63,8 +70,9 @@ function ButtonLink({ href, children, variant = "primary" }) {
     <a
       className={cx(base, styles)}
       href={href}
-      target={href?.startsWith("http") ? "_blank" : undefined}
-      rel="noreferrer"
+      target={target ?? (href?.startsWith("http") ? "_blank" : undefined)}
+      rel={rel ?? "noreferrer"}
+      download={download}
     >
       {children}
     </a>
@@ -89,6 +97,89 @@ function Section({ id, title, subtitle, children }) {
 
 function Divider() {
   return <div className="h-px w-full bg-slate-200" />;
+}
+
+/** Resume modal (opens PDF inside the same website) */
+function ResumeModal({ open, onClose }) {
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+    >
+      {/* backdrop */}
+      <button
+        type="button"
+        aria-label="Close resume preview"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/50"
+      />
+
+      {/* modal */}
+      <div className="relative z-[1000] w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <div className="text-sm font-semibold text-slate-900">
+            Resume Preview
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-50"
+          >
+            Close
+          </button>
+        </div>
+
+        <div className="h-[75vh] bg-slate-50">
+          <iframe
+            title="Bhavana Resume"
+            src={LINKS.resume}
+            className="h-full w-full"
+          />
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-4 py-3">
+          <a
+            href={LINKS.resume}
+            download
+            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            Download
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Reusable Resume buttons: Preview (modal) + Download */
+function ResumeButtons({ size = "md", onPreview }) {
+  const gap = size === "sm" ? "gap-2" : "gap-2";
+  const pad =
+    size === "sm"
+      ? "px-3 py-1.5 text-xs rounded-lg"
+      : "px-4 py-2 text-sm rounded-xl";
+
+  const base =
+    "inline-flex items-center justify-center font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2";
+  const preview =
+    "border border-slate-200 bg-white text-slate-900 hover:bg-slate-50 focus:ring-slate-300";
+  const download =
+    "bg-slate-900 text-white hover:bg-slate-800 focus:ring-slate-900";
+
+  return (
+    <div className={cx("flex items-center", gap)}>
+      <button
+        type="button"
+        onClick={onPreview}
+        className={cx(base, preview, pad)}
+      >
+        Preview Resume
+      </button>
+    </div>
+  );
 }
 
 // ---------- Content ----------
@@ -260,7 +351,6 @@ function ImpactStrip() {
       {/* gradient header */}
       <div className="relative overflow-hidden rounded-t-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 px-6 py-5 text-white">
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_right,white,transparent_60%)]" />
-
         <div className="relative">
           <div className="text-sm font-medium text-indigo-100">
             Career Highlights
@@ -282,7 +372,7 @@ function ImpactStrip() {
               {i.label}
             </div>
 
-            <div className="mt-2 text-2xl font-semibold text-slate-900 group-hover:text-indigo-600 transition">
+            <div className="mt-2 text-1xl font-semibold text-slate-900 group-hover:text-indigo-600 transition">
               {i.value}
             </div>
 
@@ -438,6 +528,7 @@ function OtherWorkRow({ p }) {
 // ---------- App ----------
 export default function App() {
   const [q, setQ] = useState("");
+  const [resumeOpen, setResumeOpen] = useState(false);
 
   const filteredOther = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -449,6 +540,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
+      {/* PDF opens inside the same website */}
+      <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
+
       {/* soft premium background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-white via-slate-50 to-slate-100" />
@@ -479,10 +573,9 @@ export default function App() {
               ))}
             </nav>
 
+            {/* UPDATED: Preview opens modal */}
             <div className="flex items-center gap-2">
-              <ButtonLink href={LINKS.resume} variant="secondary">
-                Resume
-              </ButtonLink>
+              <ResumeButtons size="sm" onPreview={() => setResumeOpen(true)} />
               <ButtonLink href={LINKS.linkedin} variant="primary">
                 LinkedIn
               </ButtonLink>
@@ -518,15 +611,15 @@ export default function App() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <ButtonLink href={LINKS.email} variant="primary">
+                <ButtonLink href={LINKS.email} variant="secondary">
                   Email
                 </ButtonLink>
                 <ButtonLink href={LINKS.github} variant="secondary">
                   GitHub
                 </ButtonLink>
-                <ButtonLink href={LINKS.resume} variant="soft">
-                  Download Resume
-                </ButtonLink>
+
+                {/* UPDATED: Preview opens modal */}
+                <ResumeButtons onPreview={() => setResumeOpen(true)} />
               </div>
             </div>
 
@@ -553,11 +646,7 @@ export default function App() {
           <Divider />
 
           {/* work/projects redesigned */}
-          <Section
-            id="work"
-            title="Selected work"
-            subtitle="Instead of a heavy grid of projects, these are presented as case studies: problem → solution → impact."
-          >
+          <Section id="work" title="Selected work">
             <div className="grid gap-5">
               {FEATURED_WORK.map((w) => (
                 <CaseStudyCard key={w.title} w={w} />
@@ -569,9 +658,6 @@ export default function App() {
                 <div>
                   <div className="text-sm font-semibold text-slate-900">
                     Other builds
-                  </div>
-                  <div className="mt-1 text-sm text-slate-600">
-                    Smaller projects / experiments. (Keep this short and clean.)
                   </div>
                 </div>
 
@@ -594,11 +680,7 @@ export default function App() {
           <Divider />
 
           {/* skills */}
-          <Section
-            id="skills"
-            title="Skills"
-            subtitle="Keep skills compact; let experience + case studies do the heavy lifting."
-          >
+          <Section id="skills" title="Skills">
             <div className="grid gap-5 md:grid-cols-2">
               {Object.entries(SKILLS).map(([group, items]) => (
                 <Card key={group} className="p-6">
@@ -618,11 +700,7 @@ export default function App() {
           <Divider />
 
           {/* contact */}
-          <Section
-            id="contact"
-            title="Contact"
-            subtitle="Make it one-click easy for recruiters."
-          >
+          <Section id="contact" title="Contact">
             <Card className="p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -637,6 +715,7 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* UPDATED: Preview opens modal */}
                 <div className="flex flex-wrap gap-2">
                   <ButtonLink href={LINKS.email} variant="primary">
                     Email
@@ -647,9 +726,7 @@ export default function App() {
                   <ButtonLink href={LINKS.github} variant="secondary">
                     GitHub
                   </ButtonLink>
-                  <ButtonLink href={LINKS.resume} variant="soft">
-                    Resume PDF
-                  </ButtonLink>
+                  <ResumeButtons onPreview={() => setResumeOpen(true)} />
                 </div>
               </div>
 
